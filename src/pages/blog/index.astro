@@ -13,75 +13,208 @@ const posts = (await getCollection('blog')).sort(
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="ja">
 	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+		<BaseHead title={`Blog | ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
 		<style>
-			main {
-				width: 960px;
-			}
-			ul {
-				display: flex;
-				flex-wrap: wrap;
-				gap: 2rem;
-				list-style-type: none;
-				margin: 0;
-				padding: 0;
-			}
-			ul li {
-				width: calc(50% - 1rem);
-			}
-			ul li * {
-				text-decoration: none;
-				transition: 0.2s ease;
-			}
-			ul li:first-child {
-				width: 100%;
-				margin-bottom: 1rem;
+			.page-header {
 				text-align: center;
+				padding: 4rem 0 3rem;
 			}
-			ul li:first-child img {
+
+			.page-header h1 {
+				font-size: clamp(2rem, 5vw, 3rem);
+				margin-bottom: 1rem;
+				background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent) 100%);
+				-webkit-background-clip: text;
+				-webkit-text-fill-color: transparent;
+				background-clip: text;
+			}
+
+			.page-header p {
+				font-size: 1.1rem;
+				max-width: 500px;
+				margin: 0 auto;
+			}
+
+			.posts-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+				gap: 2rem;
+				padding-bottom: 4rem;
+			}
+
+			.post-card {
+				display: flex;
+				flex-direction: column;
+				background: var(--bg-card);
+				border: 1px solid var(--border-color);
+				border-radius: 16px;
+				overflow: hidden;
+				text-decoration: none;
+				color: inherit;
+				transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+			}
+
+			.post-card:hover {
+				border-color: var(--border-hover);
+				transform: translateY(-6px);
+				box-shadow: var(--shadow-glow);
+			}
+
+			.post-image {
+				position: relative;
+				aspect-ratio: 16/9;
+				overflow: hidden;
+				background: var(--bg-tertiary);
+			}
+
+			.post-image img {
 				width: 100%;
+				height: 100%;
+				object-fit: cover;
+				border-radius: 0;
+				transition: transform 0.4s ease;
 			}
-			ul li:first-child .title {
-				font-size: 2.369rem;
+
+			.post-card:hover .post-image img {
+				transform: scale(1.05);
 			}
-			ul li img {
-				margin-bottom: 0.5rem;
-				border-radius: 12px;
+
+			.post-image-placeholder {
+				width: 100%;
+				height: 100%;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				gap: 1rem;
+				position: relative;
+				overflow: hidden;
 			}
-			ul li a {
-				display: block;
+
+			.post-image-placeholder::before {
+				content: '';
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				opacity: 0.15;
+				background-image: 
+					radial-gradient(circle at 20% 50%, rgba(100, 255, 218, 0.3) 0%, transparent 50%),
+					radial-gradient(circle at 80% 50%, rgba(124, 58, 237, 0.3) 0%, transparent 50%);
 			}
-			.title {
+
+			.post-image-placeholder .icon {
+				font-size: 3.5rem;
+				z-index: 1;
+				filter: drop-shadow(0 4px 20px rgba(0, 0, 0, 0.3));
+			}
+
+			.post-image-placeholder .category-label {
+				font-size: 0.75rem;
+				font-weight: 600;
+				text-transform: uppercase;
+				letter-spacing: 0.1em;
+				color: var(--accent);
+				background: rgba(100, 255, 218, 0.1);
+				padding: 0.4rem 1rem;
+				border-radius: 20px;
+				border: 1px solid rgba(100, 255, 218, 0.2);
+				z-index: 1;
+			}
+
+			/* Different gradient styles for variety */
+			.gradient-1 {
+				background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+			}
+			.gradient-2 {
+				background: linear-gradient(135deg, #1a1a2e 0%, #2d1b4e 50%, #1a1a2e 100%);
+			}
+			.gradient-3 {
+				background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+			}
+			.gradient-4 {
+				background: linear-gradient(135deg, #1a1a2e 0%, #1e3a5f 50%, #1a1a2e 100%);
+			}
+			.gradient-5 {
+				background: linear-gradient(135deg, #1a1a2e 0%, #3d1a1a 50%, #1a1a2e 100%);
+			}
+
+			.post-content {
+				padding: 1.5rem;
+				flex-grow: 1;
+				display: flex;
+				flex-direction: column;
+			}
+
+			.post-date {
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+				font-size: 0.85rem;
+				color: var(--text-muted);
+				margin-bottom: 0.75rem;
+			}
+
+			.post-date svg {
+				width: 14px;
+				height: 14px;
+			}
+
+			.post-title {
+				font-size: 1.25rem;
+				font-weight: 600;
+				color: var(--text-primary);
+				margin: 0 0 0.75rem 0;
+				line-height: 1.4;
+				transition: color 0.3s ease;
+			}
+
+			.post-card:hover .post-title {
+				color: var(--accent);
+			}
+
+			.post-description {
+				font-size: 0.9rem;
+				color: var(--text-muted);
+				line-height: 1.6;
 				margin: 0;
-				color: rgb(var(--black));
-				line-height: 1;
+				flex-grow: 1;
 			}
-			.date {
-				margin: 0;
-				color: rgb(var(--gray));
+
+			.post-footer {
+				display: flex;
+				align-items: center;
+				justify-content: flex-end;
+				margin-top: 1rem;
+				padding-top: 1rem;
+				border-top: 1px solid var(--border-color);
 			}
-			ul li a:hover h4,
-			ul li a:hover .date {
-				color: rgb(var(--accent));
+
+			.read-more {
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+				font-size: 0.85rem;
+				color: var(--accent);
+				font-weight: 500;
 			}
-			ul a:hover img {
-				box-shadow: var(--box-shadow);
+
+			.read-more svg {
+				width: 16px;
+				height: 16px;
+				transition: transform 0.3s ease;
 			}
-			@media (max-width: 720px) {
-				ul {
-					gap: 0.5em;
-				}
-				ul li {
-					width: 100%;
-					text-align: center;
-				}
-				ul li:first-child {
-					margin-bottom: 0;
-				}
-				ul li:first-child .title {
-					font-size: 1.563em;
+
+			.post-card:hover .read-more svg {
+				transform: translateX(4px);
+			}
+
+			@media (max-width: 768px) {
+				.posts-grid {
+					grid-template-columns: 1fr;
 				}
 			}
 		</style>
@@ -89,25 +222,69 @@ const posts = (await getCollection('blog')).sort(
 	<body>
 		<Header />
 		<main>
-			<section>
-				<ul>
-					{
-						posts.map((post) => (
-							<li>
-								<a href={`/blog/${post.id}/`}>
-									{post.data.heroImage && (
+			<div class="page-header">
+				<h1>Blog</h1>
+				<p>技術に関する学びや考えを発信しています</p>
+			</div>
+			<div class="posts-grid">
+				{
+					posts.map((post, index) => {
+						// アイコンとカテゴリをタイトルから推測
+						const title = post.data.title.toLowerCase();
+						let icon = '📝';
+						let category = 'Article';
+						let gradientClass = `gradient-${(index % 5) + 1}`;
+						
+						if (title.includes('python') || title.includes('自動化')) {
+							icon = '🐍';
+							category = 'Python';
+						} else if (title.includes('chrome') || title.includes('拡張機能')) {
+							icon = '🧩';
+							category = 'Extension';
+						} else if (title.includes('azure') || title.includes('cloud')) {
+							icon = '☁️';
+							category = 'Cloud';
+						} else if (title.includes('llm') || title.includes('ai') || title.includes('gpt')) {
+							icon = '🤖';
+							category = 'AI';
+						} else if (title.includes('ポートフォリオ') || title.includes('開設')) {
+							icon = '🚀';
+							category = 'Announcement';
+						}
+						
+						return (
+							<a href={`/blog/${post.id}/`} class="post-card">
+								<div class="post-image">
+									{post.data.heroImage ? (
 										<Image width={720} height={360} src={post.data.heroImage} alt="" />
+									) : (
+										<div class={`post-image-placeholder ${gradientClass}`}>
+											<span class="icon">{icon}</span>
+											<span class="category-label">{category}</span>
+										</div>
 									)}
-									<h4 class="title">{post.data.title}</h4>
-									<p class="date">
+								</div>
+								<div class="post-content">
+									<div class="post-date">
+										<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
 										<FormattedDate date={post.data.pubDate} />
-									</p>
-								</a>
-							</li>
-						))
-					}
-				</ul>
-			</section>
+									</div>
+									<h2 class="post-title">{post.data.title}</h2>
+									{post.data.description && (
+										<p class="post-description">{post.data.description}</p>
+									)}
+									<div class="post-footer">
+										<span class="read-more">
+											Read more
+											<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+										</span>
+									</div>
+								</div>
+							</a>
+						);
+					})
+				}
+			</div>
 		</main>
 		<Footer />
 	</body>

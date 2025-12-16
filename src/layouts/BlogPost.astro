@@ -11,46 +11,143 @@ type Props = CollectionEntry<'blog'>['data'];
 const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 ---
 
-<html lang="en">
+<html lang="ja">
 	<head>
 		<BaseHead title={title} description={description} />
 		<style>
 			main {
-				width: calc(100% - 2em);
+				width: 100%;
 				max-width: 100%;
 				margin: 0;
+				padding: 0;
 			}
+
 			.hero-image {
 				width: 100%;
+				max-width: 900px;
+				margin: 2rem auto 0;
+				padding: 0 1.5rem;
 			}
+
 			.hero-image img {
 				display: block;
+				width: 100%;
+				border-radius: 16px;
+				box-shadow: var(--shadow-lg);
+			}
+
+			article {
+				max-width: 760px;
 				margin: 0 auto;
-				border-radius: 12px;
-				box-shadow: var(--box-shadow);
+				padding: 4rem 1.5rem 6rem;
 			}
-			.prose {
-				width: 720px;
-				max-width: calc(100% - 2em);
-				margin: auto;
-				padding: 1em;
-				color: rgb(var(--gray-dark));
-			}
-			.title {
-				margin-bottom: 1em;
-				padding: 1em 0;
+
+			.article-header {
 				text-align: center;
-				line-height: 1;
+				margin-bottom: 3rem;
+				padding-bottom: 2rem;
+				border-bottom: 1px solid var(--border-color);
 			}
-			.title h1 {
-				margin: 0 0 0.5em 0;
+
+			.article-meta {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				gap: 1rem;
+				margin-bottom: 1.5rem;
+				color: var(--text-muted);
+				font-size: 0.9rem;
 			}
-			.date {
-				margin-bottom: 0.5em;
-				color: rgb(var(--gray));
+
+			.article-date {
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
 			}
-			.last-updated-on {
+
+			.article-date svg {
+				width: 16px;
+				height: 16px;
+				stroke: currentColor;
+			}
+
+			.last-updated {
 				font-style: italic;
+				color: var(--text-muted);
+			}
+
+			.article-title {
+				font-size: clamp(2rem, 5vw, 3rem);
+				line-height: 1.2;
+				margin-bottom: 1rem;
+				background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent) 100%);
+				-webkit-background-clip: text;
+				-webkit-text-fill-color: transparent;
+				background-clip: text;
+			}
+
+			.article-description {
+				font-size: 1.1rem;
+				color: var(--text-muted);
+				max-width: 600px;
+				margin: 0 auto;
+			}
+
+			.prose {
+				color: var(--text-secondary);
+				line-height: 1.8;
+			}
+
+			.prose h2 {
+				margin-top: 3rem;
+				margin-bottom: 1.5rem;
+				font-size: 1.75rem;
+				color: var(--text-primary);
+			}
+
+			.prose h3 {
+				margin-top: 2.5rem;
+				margin-bottom: 1rem;
+				font-size: 1.35rem;
+				color: var(--text-primary);
+			}
+
+			.prose p {
+				margin-bottom: 1.5rem;
+				color: var(--text-secondary);
+			}
+
+			.prose a {
+				color: var(--accent);
+				text-decoration: underline;
+				text-underline-offset: 3px;
+			}
+
+			.prose a:hover {
+				color: var(--text-primary);
+			}
+
+			.prose ul, .prose ol {
+				margin-bottom: 1.5rem;
+				padding-left: 1.5rem;
+			}
+
+			.prose li {
+				margin-bottom: 0.5rem;
+				color: var(--text-secondary);
+			}
+
+			.prose img {
+				border-radius: 12px;
+				margin: 2rem 0;
+			}
+
+			.prose pre {
+				margin: 2rem 0;
+			}
+
+			.prose blockquote {
+				margin: 2rem 0;
 			}
 		</style>
 	</head>
@@ -59,24 +156,29 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 		<Header />
 		<main>
 			<article>
-				<div class="hero-image">
-					{heroImage && <Image width={1020} height={510} src={heroImage} alt="" />}
+				{heroImage && (
+					<div class="hero-image">
+						<Image width={1020} height={510} src={heroImage} alt="" />
+					</div>
+				)}
+				<div class="article-header">
+					<div class="article-meta">
+						<span class="article-date">
+							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+							<FormattedDate date={pubDate} />
+						</span>
+						{
+							updatedDate && (
+								<span class="last-updated">
+									(Updated: <FormattedDate date={updatedDate} />)
+								</span>
+							)
+						}
+					</div>
+					<h1 class="article-title">{title}</h1>
+					{description && <p class="article-description">{description}</p>}
 				</div>
 				<div class="prose">
-					<div class="title">
-						<div class="date">
-							<FormattedDate date={pubDate} />
-							{
-								updatedDate && (
-									<div class="last-updated-on">
-										Last updated on <FormattedDate date={updatedDate} />
-									</div>
-								)
-							}
-						</div>
-						<h1>{title}</h1>
-						<hr />
-					</div>
 					<slot />
 				</div>
 			</article>
