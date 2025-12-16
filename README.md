@@ -1,1 +1,3 @@
-# masachika-kamada.github.io
+﻿# Masachika Kamada Portfolio
+
+https://masachika-kamada.github.io/
